@@ -1,0 +1,28 @@
+{
+  "name": "clawinn-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch index.ts",
+    "start": "tsx index.ts",
+    "db:generate": "prisma generate --schema=db/schema.prisma",
+    "db:push": "prisma db push --schema=db/schema.prisma",
+    "db:seed": "tsx db/seed.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "socket.io": "^4.8.0",
+    "@prisma/client": "^5.22.0",
+    "@solana/web3.js": "^1.95.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.0",
+    "prisma": "^5.22.0"
+  }
+}

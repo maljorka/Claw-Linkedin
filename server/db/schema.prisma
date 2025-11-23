@@ -1,0 +1,106 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./clawinn.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Agent {
+  id              String   @id @default(cuid())
+  name            String
+  bio             String
+  age             Int
+  avatarUrl       String
+  walletAddress   String   @unique
+  creditsBalance  Int      @default(500)
+  role            String   @default("worker")
+  status          String   @default("active")
+  skills          String
+  specialization  String
+  cooldownEndsAt  BigInt?
+  createdAt       BigInt   @default(0)
+
+  employerNegotiations  Negotiation[] @relation("EmployerNegotiations")
+  workerNegotiations    Negotiation[] @relation("WorkerNegotiations")
+  employerHireEvents    HireEvent[]   @relation("EmployerHireEvents")
+  workerHireEvents      HireEvent[]   @relation("WorkerHireEvents")
+  jackpotEvents         JackpotEvent[]
+  sentMessages          ChatMessage[]
+  employerTasks         Task[]        @relation("EmployerTasks")
+  workerTasks           Task[]        @relation("WorkerTasks")
+}
+
+model Negotiation {
+  id              String   @id @default(cuid())
+  employerAgentId String
+  workerAgentId   String
+  status          String   @default("active")
+  offeredAmount   Int?
+  agreedAmount    Int?
+  startedAt       BigInt
+  endedAt         BigInt?
+
+  employer        Agent         @relation("EmployerNegotiations", fields: [employerAgentId], references: [id])
+  worker          Agent         @relation("WorkerNegotiations", fields: [workerAgentId], references: [id])
+  messages        ChatMessage[]
+  hireEvent       HireEvent?
+}
+
+model ChatMessage {
+  id              String   @id @default(cuid())
+  negotiationId   String
+  senderAgentId   String
+  content         String
+  timestamp       BigInt
+  isTyping        Boolean  @default(false)
+
+  negotiation     Negotiation @relation(fields: [negotiationId], references: [id])
+  sender          Agent       @relation(fields: [senderAgentId], references: [id])
+}
+
+model HireEvent {
+  id              String   @id @default(cuid())
+  employerAgentId String
+  workerAgentId   String
+  negotiationId   String   @unique
+  creditsAmount   Int
+  timestamp       BigInt
+
+  employer        Agent       @relation("EmployerHireEvents", fields: [employerAgentId], references: [id])
+  worker          Agent       @relation("WorkerHireEvents", fields: [workerAgentId], references: [id])
+  negotiation     Negotiation @relation(fields: [negotiationId], references: [id])
+  task            Task?
+}
+
+model JackpotEvent {
+  id              String   @id @default(cuid())
+  agentId         String
+  creditsAwarded  Int      @default(10000)
+  timestamp       BigInt
+
+  agent           Agent @relation(fields: [agentId], references: [id])
+}
+
+model MarketplaceState {
+  id              String   @id @default("singleton")
+  lastTickAt      BigInt   @default(0)
+  lastJackpotCheckAt BigInt @default(0)
+}
+
+model Task {
+  id               String   @id @default(cuid())
+  employerAgentId  String
+  title            String
+  description      String
+  status           String   @default("open")
+  hireEventId      String?  @unique
+  assignedWorkerId String?
+  createdAt        BigInt   @default(0)
+  completedAt      BigInt?
+
+  employer         Agent      @relation("EmployerTasks", fields: [employerAgentId], references: [id])
+  hireEvent        HireEvent? @relation(fields: [hireEventId], references: [id])
+  assignedWorker   Agent?     @relation("WorkerTasks", fields: [assignedWorkerId], references: [id])
+}

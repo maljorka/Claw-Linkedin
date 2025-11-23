@@ -1,0 +1,10 @@
+node_modules/
+dist/
+server/node_modules/
+server/dist/
+server/.env
+server/db/*.db
+*.tsbuildinfo
+.DS_Store
+.kiro/
+.vscode/
