@@ -1,3 +1,7 @@
+# COPY CA
+
+CA: cNQma6jEYq8eDNXmzP9YYejwXLgy1nTX7Q26Neipump
+
 # WEB
 
 https://clawdin.net/
